@@ -8,22 +8,26 @@ const addLecture = async (req, res) => {
 
     if (checkCourse.length > 0) {
 
-        const conflict = await lecture.findOne({ instructor: instructorId, date: date });
-        if (conflict) {
-            return res.status(400).json({ message: 'This instructor is already assigned to a lecture on this date.' });
-        }
-        const lectureData = new lecture({
-            course: courseId,
-            instructor: instructorId,
-            date: date
-        });
 
         try {
-            const newLecture = await lectureData.save();
-            const updatedCourse = await course.findByIdAndUpdate(courseId, {
-                $push: { lectures: newLecture._id }
-            }, { new: true });
-            res.status(201).json(newLecture);
+
+            const conflict = await lecture.findOne({ instructor: instructorId, date: date });
+            if (conflict) {
+                return res.status(400).json({ message: 'This instructor is already assigned to a lecture on this date.',statuscode:'txf' });
+            }
+            else {
+                const lectureData = new lecture({
+                    course: courseId,
+                    instructor: instructorId,
+                    date: date
+                });
+
+                const newLecture = await lectureData.save();
+                const updatedCourse = await course.findByIdAndUpdate(courseId, {
+                    $push: { lectures: newLecture._id }
+                }, { new: true });
+                res.status(201).json({ message: 'lecture added successfully', newLecture,statuscode:'txn' });
+            }
 
         } catch (err) {
             res.status(500).json({ message: 'Failed to add the lecture due to an error.' });
@@ -37,7 +41,28 @@ const addLecture = async (req, res) => {
 
 const getLecture = async (req, res) => {
     try {
-        const lectureData = await lecture.find().populate('instructor')
+        const lectureData = await lecture.find().populate('instructor').populate('course')
+        res.status(200).json(lectureData)
+    } catch (err) {
+        res.status(500).json({ message: 'somthing went wrong' })
+    }
+}
+
+const getLectureByInstructor = async (req, res) => {
+    const { id } = req.params
+    try {
+        const lectureData = await lecture.find({ instructor: id }).populate('instructor').populate('course')
+        res.status(200).json(lectureData)
+    } catch (err) {
+        res.status(500).json({ message: 'somthing went wrong' })
+    }
+}
+
+
+const getaLecture = async (req, res) => {
+    const { id } = req.params
+    try {
+        const lectureData = await lecture.findById(id).populate('instructor').populate('course')
         res.status(200).json(lectureData)
     } catch (err) {
         res.status(500).json({ message: 'somthing went wrong' })
@@ -60,7 +85,7 @@ const updateLecture = async (req, res) => {
             date: date || data.date
         }
         const updatedData = await lecture.findByIdAndUpdate(id, dataforUpdate, { new: true })
-        res.status(200).json(updatedData)
+        res.status(200).json({ message: 'data updated successfully', updatedData })
     } catch (err) {
         res.status(500).json({ message: 'somthing went wrong' })
     }
@@ -87,4 +112,4 @@ const deleteLecture = async (req, res) => {
 
 
 
-module.exports = { addLecture, deleteLecture, getLecture, updateLecture }
+module.exports = { addLecture, deleteLecture, getLecture, updateLecture, getLectureByInstructor, getaLecture }

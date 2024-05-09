@@ -7,8 +7,8 @@ const router = express.Router()
 
 router.post('/add/course', authMiddleware, upload.single('image'), addCourse)
 router.get('/get/course', authMiddleware, getCourse)
-router.get('/get/getaCourse/:id', authMiddleware,isAdmin, getaCourse)
-router.delete('/deleteCourse/:id', authMiddleware, deleteCourse)
-router.put('/updateCourse/:id', authMiddleware, updateCourse)
+router.get('/get/getaCourse/:id', authMiddleware, getaCourse)
+router.post('/deleteCourse/:id', authMiddleware,isAdmin, deleteCourse)
+router.post('/updateCourse/:id', authMiddleware,isAdmin, updateCourse)
 
 module.exports = router

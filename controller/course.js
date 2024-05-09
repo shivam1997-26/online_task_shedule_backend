@@ -24,6 +24,7 @@ const getCourse = async (req, res) => {
             path: 'lectures',
             populate: { path: 'instructor' }
         });
+
         res.json(courseData);
     } catch (err) {
         res.status(500).json({ message: err.message });
@@ -47,7 +48,7 @@ const deleteCourse = async (req, res) => {
     const { id } = req.params
     try {
         const courseData = await course.findByIdAndDelete(id)
-        res.json(courseData);
+        res.json({ message: 'course deleted successfully', courseData });
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
@@ -62,6 +63,7 @@ const updateCourse = async (req, res) => {
         if (!getCourseData) {
             res.status(404).json({ message: "Course not found" });
         } else {
+            console.log(req.body)
             const data = {
                 name: req.body.name || getCourseData.name,
                 level: req.body.level || getCourseData.level,

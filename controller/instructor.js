@@ -2,6 +2,7 @@ const { generateToken } = require("../config/jwtToken")
 const instructor = require("../model/instructor")
 
 const addInstructor = async (req, res) => {
+
     try {
         const data = await instructor.findOne({ email: req.body.email })
         if (!data) {
